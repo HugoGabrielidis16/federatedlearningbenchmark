@@ -15,33 +15,47 @@ model = tf.keras.Sequential(
     ]
 )
 model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
-
-
-# Load CIFAR-10 dataset
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-
-x_train = tf.reshape(x_train, x_train.shape + (1,))
-x_test = tf.reshape(x_test, x_test.shape + (1,))
-
-
 # Define Flower client
-class MNISTClient(fl.client.NumPyClient):
+class MNISTClient_test(fl.client.NumPyClient):
+    def __init__(self, X_train, X_test, y_train, y_test,model):
+        self.model = model
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
+
     def get_parameters(self):
-        return model.get_weights()
+        """Return current weights."""
+        return self.model.get_weights()
+
+    
+        
 
     def fit(self, parameters, config):
-        model.set_weights(parameters)
-        model.fit(x_train, y_train, epochs=1, batch_size=32, steps_per_epoch=3)
-        return model.get_weights(), len(x_train), {}
+        """Fit model and return new weights as well as number of training
+        examples."""
+        self.model.set_weights(parameters)
+        # Remove steps_per_epoch if you want to train over the full dataset
+        # https://keras.io/api/models/model_training_apis/#fit-method
+
+        history = self.model.fit(
+            self.X_train,  # A modifier afin de fit pas sur les memes donnes (le client genere des donnes sucessivent)
+            self.y_train,
+            epochs=1,
+            batch_size=3,
+            steps_per_epoch=1,
+            verbose=1,
+        )
+        return self.model.get_weights(), len(self.X_train), {}
 
     def evaluate(self, parameters, config):
-        model.set_weights(parameters)
-        loss, accuracy = model.evaluate(x_test, y_test)
-        return loss, len(x_test), {"accuracy": accuracy}
 
+        """Evaluate using provided parameters."""
+        self.model.set_weights(parameters)
+        loss, accuracy = self.model.evaluate(self.X_test, self.y_test)
+        return loss, len(self.X_test), {"accuracy": accuracy}
+    
     def get_properties():
         pass
 
 
-# Start Flower client
-fl.client.start_numpy_client(server_address="[::]:8080", client=MNISTClient())
