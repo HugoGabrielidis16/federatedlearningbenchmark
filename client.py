@@ -44,7 +44,7 @@ class MNISTClient_test(fl.client.NumPyClient):
             epochs=1,
             batch_size=3,
             steps_per_epoch=1,
-            verbose=1,
+                verbose=1,
         )
         return self.model.get_weights(), len(self.X_train), {}
 
