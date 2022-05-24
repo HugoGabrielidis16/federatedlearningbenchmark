@@ -42,9 +42,8 @@ class MNISTClient_test(fl.client.NumPyClient):
             self.X_train,  # A modifier afin de fit pas sur les memes donnes (le client genere des donnes sucessivent)
             self.y_train,
             epochs=1,
-            batch_size=3,
-            steps_per_epoch=1,
-                verbose=1,
+            batch_size=1,
+            verbose=1,
         )
         return self.model.get_weights(), len(self.X_train), {}
 
