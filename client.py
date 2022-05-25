@@ -30,7 +30,6 @@ class MNISTClient_test(fl.client.NumPyClient):
 
     
         
-
     def fit(self, parameters, config):
         """Fit model and return new weights as well as number of training
         examples."""
