@@ -8,8 +8,11 @@ canvas_html = """
 <button id ="Clear"> Clear </button>
 <script>
 var canvas = document.querySelector('canvas')
+canvas.style.border = '1px solid black';
 var ctx = canvas.getContext('2d')
 ctx.lineWidth = %d
+
+
 var finish = document.querySelector('#Finish')
 var clear = document.querySelector('#Clear')
 var mouse = {x: 0, y: 0}
