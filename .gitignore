@@ -4,6 +4,7 @@
 *.txt
 *.gz
 *.h5
+*.zip
 */__pycache__
 archives/
 ./archives/Data_JS/DataSet1/Data_JS/Input.csv
