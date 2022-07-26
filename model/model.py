@@ -28,5 +28,8 @@ class FLModel() :
         elif dataset == "CIFAR10":
             from .model_CIFAR10 import create_model_CIFAR10
             self.model, self.loss, self.optimizer, self.metrics= create_model_CIFAR10()
+        elif dataset == "JS":
+            from .model_JS import create_model_JS
+            self.model, self.loss, self.optimizer, self.metrics= create_model_JS()
 
     

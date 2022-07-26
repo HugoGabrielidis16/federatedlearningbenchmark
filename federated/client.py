@@ -41,26 +41,13 @@ class Client(fl.client.NumPyClient):
         # Remove steps_per_epoch if you want to train over the full dataset
         # https://keras.io/api/models/model_training_apis/#fit-method
         if self.accumulated_data:
-          X_train_rnd = self.X_train[
-            0 : 
-            max(int(   ((self.actual_rnd + 1) / self.nbr_rounds) * len(self.X_train)),1)
-          ]
-          y_train_rnd = self.y_train[
-            0 : 
-            max( int(((self.actual_rnd + 1) / self.nbr_rounds) * len(self.y_train)),1)
-          ]
+          X_train_rnd = self.X_train[0:self.actual_rnd]
+          y_train_rnd = self.y_train[0:self.actual_rnd]
         
         else :  
-          X_train_rnd = self.X_train[
-            int((self.actual_rnd / self.nbr_rounds) * len(self.X_train)) : 
-            int(((self.actual_rnd + 1) / self.nbr_rounds) * len(self.X_train)
-            )
-          ]
-          y_train_rnd = self.y_train[
-            int((self.actual_rnd / self.nbr_rounds) * len(self.y_train)) : 
-            int(((self.actual_rnd + 1) / self.nbr_rounds) * len(self.y_train)
-            )
-          ]  # So on each round the client train on differents Dataset
+          
+          X_train_rnd = self.X_train[self.actual_rnd]
+          y_train_rnd = self.y_train[self.actual_rnd]
 
         self.actual_rnd += 1
         batch_size = 1

@@ -7,7 +7,7 @@ def create_model_CIFAR10():
     )
  
     for layer in Resnet.layers:
-        layer.trainable = False
+        layer.trainable = True 
     
     inputs = tf.keras.layers.Input(shape=(32, 32, 3))
     x = Resnet(inputs)

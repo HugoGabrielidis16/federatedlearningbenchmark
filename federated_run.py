@@ -14,7 +14,6 @@ warnings.filterwarnings("ignore")
 from centralized.centralized import Centralized
 from federated.federated import Federated
 from model.model import FLModel
-from data.data import Data
 import FLconfig
 
 
@@ -96,14 +95,12 @@ def main() -> None:
     except:
         pass
 
-    dataset = Data(args.Dataset)
     metrics = take_metrics(args.Dataset)
     dataset_name = args.Dataset
     graph = tf.get_default_graph()
     print("-------------------" * 5 + "Start of Federated" + "-----------------" *5)
     federated_run = Federated(
             dataset_name = dataset_name,
-            data = dataset ,
             directory_name = directory_name, 
             nbr_rounds = args.nbr_rounds, 
             nbr_clients = args.nbr_clients, 

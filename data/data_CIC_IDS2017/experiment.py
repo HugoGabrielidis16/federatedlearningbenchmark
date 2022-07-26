@@ -88,6 +88,15 @@ Ubuntu_server_12_Public = pd.concat(
         train_df[train_df["Destination IP"] == "205.174.165.66"],
     ]
 )
+
+
+Firewall = pd.concat(
+      
+      [
+      train_df[train_df["Destination IP"]  == "205.174.165.80"],
+      train_df[train_df["Destination IP"]  == "172.16.0.1"]
+      ]
+      )
 Ubuntu_14_4_32B = train_df[train_df["Destination IP"] == "192.168.10.19"]
 Ubuntu_14_4_64B = train_df[train_df["Destination IP"] == "192.168.10.17"]
 Ubuntu_16_4_32B = train_df[train_df["Destination IP"] == "192.168.10.16"]
@@ -100,6 +109,7 @@ Win_10_64B = train_df[train_df["Destination IP"] == "192.168.10.15"]
 MACe = train_df[train_df["Destination IP"] == "192.168.10.25"]
 
 Insiders = [
+    Firewall,
     Web_server_16_Public,
     Ubuntu_server_12_Public,
     Ubuntu_14_4_32B,

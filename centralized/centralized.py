@@ -3,20 +3,20 @@ import time
 import tensorflow as tf
 import numpy as np
 from multiprocessing import Process
+#tf.disable_v2_behavior()
+from data.data import DataFactory
+
 
 
 class Centralized(Process):
 
-    def __init__(self, model, data, nbr_clients, nbr_rounds, directory_name, metrics, accumulated_data, percentage):
+    def __init__(self, model, dataset, nbr_clients, nbr_rounds, directory_name, metrics, accumulated_data, percentage):
         super(Centralized,self).__init__()
         self.model = model
-        self.X_train = data.X_train[:int(len(data.X_train) * percentage)]
-        self.X_test = data.X_test
-        self.y_train = data.y_train[:int(len(data.y_train) * percentage)]
-        self.y_test = data.y_test
+        self.X_train, self.X_test, self.y_train, self.y_test = DataFactory.load_data(dataset,nbr_clients, nbr_rounds, percentage )
+        
         self.nbr_clients = nbr_clients
         self.epochs = nbr_rounds
-        self.percentage = percentage
         self.accumulated_data = accumulated_data
         self.directory_name = directory_name + "/centralized"
         self.metrics_list = []
@@ -24,41 +24,16 @@ class Centralized(Process):
              
         self.duration = []
         
+
     def partitioning(self):
         """
         Partition the training samples 
         """
-        X_train_epochs_client = [ [] for i in range(self.epochs)]
-        y_train_epochs_client = [ [] for i in range(self.epochs) ]
-        print('percentage of data used :' +str(self.percentage) + ' size of train data : ' + str(len(self.X_train) ))
-        print("Accumulated data : " + str(self.accumulated_data))
-        for i in range(self.nbr_clients):
-            X_train_clients = self.X_train[
-                    int( (i / self.nbr_clients) * len(self.X_train) ) :
-                    int( ( ((i +1)/self.nbr_clients)) * len(self.X_train ))
-                    ]
-            y_train_clients = self.y_train[
-                    int( (i / self.nbr_clients) * len(self.y_train) ) :
-                    int( ( ((i +1)/self.nbr_clients)) * len(self.y_train ))
-                    ]
-            for epoch in range(self.epochs):
-                X_train_client_epoch = X_train_clients[
-                    int( ( epoch / self.epochs) * len(X_train_clients) ):
-                    int( ((epoch +1)/self.epochs) * len(X_train_clients) )
-                ]
-                y_train_client_epoch = y_train_clients[
-                    int( ( epoch / self.epochs) * len(y_train_clients) ):
-                    int( ((epoch +1)/self.epochs) * len(y_train_clients) )
-                ]
-                
-                X_train_epochs_client[epoch].append(X_train_client_epoch)
-                y_train_epochs_client[epoch].append(y_train_client_epoch)
-
         X_train_epochs = []
         y_train_epochs = []
         for epoch in range(self.epochs):
-            X_t = X_train_epochs_client[epoch][0]
-            y_t = y_train_epochs_client[epoch][0]
+            X_t = self.X_train[epoch][0]
+            y_t = self.y_train[epoch][0]
 
             if self.accumulated_data:
               for k in range(epoch+1):
@@ -66,14 +41,14 @@ class Centralized(Process):
                   if (k == 0 ) & ( j == 0): # we skip the first epoch of the first clients since it is already in the concat
                     pass
                   else : 
-                    X_t = np.concatenate([X_t, X_train_epochs_client[k][j]], 0)
-                    y_t = np.concatenate([y_t, y_train_epochs_client[k][j]], 0)
+                    X_t = np.concatenate([X_t, self.X_train[k][j]], 0)
+                    y_t = np.concatenate([y_t, self.y_train[k][j]], 0)
 
             else :
 
-              for i in range(1,len(X_train_epochs_client[epoch])):
-                X_t = np.concatenate([X_t, X_train_epochs_client[epoch][i]], 0)
-                y_t = np.concatenate([y_t, y_train_epochs_client[epoch][i]], 0) 
+              for i in range(1,len(self.X_train[epoch])):
+                X_t = np.concatenate([X_t, self.X_train[epoch][i]], 0)
+                y_t = np.concatenate([y_t, self.y_train[epoch][i]], 0) 
             
             X_train_epochs.append(X_t)
             y_train_epochs.append(y_t)
@@ -106,11 +81,11 @@ class Centralized(Process):
           start = time.time()
 
           history = self.model.fit( 
-                X_train_epochs[epoch], 
-                y_train_epochs[epoch], 
-                batch_size = 1
+                (X_train_epochs[epoch]), 
+                (y_train_epochs[epoch]), 
+                batch_size = 1,
                 )
-          loss, metrics_used = self.model.evaluate(self.X_test, self.y_test, batch_size = 64, verbose = 1)
+          loss, metrics_used = self.model.evaluate(self.X_test, self.y_test, batch_size = 32, verbose = 1)
           self.metrics_list.append((loss,metrics_used))
           end = time.time()
           self.duration.append(end-start)

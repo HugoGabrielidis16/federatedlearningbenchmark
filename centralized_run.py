@@ -14,7 +14,6 @@ warnings.filterwarnings("ignore")
 from centralized.centralized import Centralized
 from federated.federated import Federated
 from model.model import FLModel
-from data.data import Data
 import FLconfig
 
 
@@ -129,16 +128,14 @@ def main() -> None:
       metrics = metrics_
       )
     
-    model_federated = tf.keras.models.clone_model(model)
   
-    dataset = Data(args.Dataset)
     metrics = take_metrics(args.Dataset)
     dataset_name = args.Dataset
     print("-------------------"*5 + " Start of Centralized " + "-------------------"*5)
     start_centralized = time.time()
     centralized_run = Centralized(
                 model = model_centralized,
-                data = dataset,
+                dataset = dataset_name,
                 directory_name = directory_name,
                 nbr_rounds = args.nbr_rounds,
                 nbr_clients = args.nbr_clients,

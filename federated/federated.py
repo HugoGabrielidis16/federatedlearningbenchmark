@@ -9,7 +9,7 @@ from federated.server.FedYogi import FedYogi
 import pickle
 from .client import Client
 from model.model import FLModel
-
+from data.data import DataFactory
 import tensorflow.compat.v1.keras.backend as K
 tf.disable_v2_behavior()
 
@@ -18,16 +18,14 @@ session = tf.compat.v1.Session(graph = tf.Graph() )
 with session.graph.as_default():
   tf.keras.backend.set_session(session)
 """
+
 class Federated():
 
-    def __init__(self,dataset_name,data,strategy,nbr_clients,nbr_rounds,directory_name,
+    def __init__(self,dataset_name,strategy,nbr_clients,nbr_rounds,directory_name,
                  accumulated_data, graph):
 
+          self.X_train, self.X_test, self.y_train, self.y_test = DataFactory.load_data(dataset_name,nbr_clients, nbr_rounds)
           self.dataset_name = dataset_name
-          self.X_train = data.X_train
-          self.X_test = data.X_test
-          self.y_train = data.y_train
-          self.y_test = data.y_test
           self.strategy = strategy
           self.nbr_clients = nbr_clients
           self.nbr_rounds = nbr_rounds
@@ -107,17 +105,10 @@ class Federated():
         
         # Create partition for each client
         for i in range(self.nbr_clients):
-            X_train_client = self.X_train[
-                        int(( i / self.nbr_clients) * int(self.X_train.shape[0])) : 
-                        int( ((i+1) / self.nbr_clients) * int(self.X_train.shape[0])) ]
-                
-            y_train_client = self.y_train[
-                        int(( i / self.nbr_clients) * int(self.y_train.shape[0])) : 
-                        int( ((i+1) / self.nbr_clients) * int(self.y_train.shape[0])) ]
-            
+            print("i : "+str(i)+ ", size of X_train : "+ str(len(self.X_train)) )
             Client_i = Process(
                         target = self.start_client,
-                        args = (X_train_client, y_train_client,i),
+                        args = (self.X_train[i],self.y_train[i],i),
                         )
             Client_i.start()
             process.append(Client_i)

@@ -3,8 +3,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-def Data():
-    path = "/home/hugo/hugo/Stage/Data_JS/DataSet1/Data_JS/"
+def load_data_JS():
+    path = "../Stage/archives/Data_JS/DataSet1/Data_JS/"
     df = pd.read_csv(path + "Input.csv", sep=";")
     y = pd.read_csv(path + "data_MOS.csv", sep=";").iloc[:, 0:7]
 
@@ -30,6 +30,6 @@ def Data():
     )
     return X_train, X_test, y_train, y_test
 
-
-X_train, X_test, y_train, y_test = Data()
-print(len(X_train))
+if __name__ == "__main__":
+  X_train, X_test, y_train, y_test = Data()
+  print(len(X_train))
