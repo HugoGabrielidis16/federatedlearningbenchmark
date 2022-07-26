@@ -1,42 +1,30 @@
-
-
-
-import pandas as pd
-import numpy as np
-import tensorflow as tf
-from sklearn.model_selection import train_test_split
-
-def load_data_DisasterTweets():
+def Data():
+    import pandas as pd
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+    import tensorflow as tf
 
     train_df = pd.read_csv(
-        "data/data_DisasterTweets/train.csv"
+        "/home/hugo/hugo/Stage/data/data_DisasterTweets/train.csv"
     )
-
     # Shuffling the training dataframe
-    train_df = train_df.sample(frac=1, random_state=42)
-    X = np.asarray(train_df["text"])
-    y = np.asarray(train_df["target"])
-    
-    
-    X_train, X_test = train_test_split(X, test_size = 0.2, shuffle = True, random_state = 1)
-    y_train, y_test = train_test_split(y, test_size = 0.2, shuffle = True, random_state = 1)
+    train_df_shuffled = train_df.sample(frac=1, random_state=42)
 
-   
-    return (
-        X_train,
-        X_test,
-        y_train,
-        y_test,
+    # Split our data into training and test sets
+    data_X = np.asarray(train_df_shuffled["text"])
+    y = np.asarray(train_df_shuffled["target"])
+    X_train, X_test, y_train, y_test = train_test_split(
+        data_X,
+        y,
+        test_size=0.1,
     )
-   
-if __name__ == "__main__":
-  X_train, X_test, y_train, y_test = load_data_DisasterTweets()
-  print(X_train.shape)
-  print(X_test.shape)
-  print(y_train.shape)
-  print(y_test.shape)
-
-  print(type(X_train))
-  print(type(y_train))
+    return (
+        tf.constant(X_train[:int(len(X_train))]),
+        tf.constant(X_test),
+        tf.constant(y_train[:int(len(y_train))]),
+        tf.constant(y_test),
+    )
 
 
+X_train, X_test, y_train, y_test = Data()
+print(len(X_train))

@@ -1,3 +1,3 @@
-python3 centralized_run.py --Dataset=$1 --strategy=FedAvg --nbr_clients=$2 --nbr_rounds=$3 --accumulated_data=False --centralized_percentage=1 --directory_name=$4
-
-python3 federated_run.py --Dataset=$1 --strategy=FedAvg --nbr_clients=$2 --nbr_rounds=$3 --accumulated_data=False  --directory_name=$4
+python3 Launcher.py --Dataset=IMDB --strategy=FedAvg --nbr_clients=5 --nbr_rounds=100 --accumulated_data=False --centralized_percentage=1
+python3 Launcher.py --Dataset=IMDB --strategy=FedAdam --nbr_clients=5 --nbr_rounds=100 --accumulated_data=False --centralized_percentage=1
+python3 Launcher.py --Dataset=IMDB --strategy=FedYogi --nbr_clients=5 --nbr_rounds=100 --accumulated_data=False --centralized_percentage=1

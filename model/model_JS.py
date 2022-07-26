@@ -23,3 +23,7 @@ def create_model_JS():
         metrics=[tf.keras.metrics.MeanSquaredError()],
     )
     return model_JS
+
+if __name__ == "__main__":
+  model = create_model_JS()
+  model.summary()

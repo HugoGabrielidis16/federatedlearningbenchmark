@@ -7,15 +7,32 @@ import pandas as pd
 
 
 import matplotlib.pyplot as plt
+"""
+tf.get_logger().setLevel("ERROR")
 
-def load_data_IMDB():
-    pos_train_folder = (
-    "data/data_IMDB/aclImdb/train/pos/"
-    )
-    neg_train_folder = (
-    "data/data_IMDB/aclImdb/train/neg/"
-    )
+url = "https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"
 
+dataset = tf.keras.utils.get_file(
+    "aclImdb_v1.tar.gz", url, untar=True, cache_dir=".", cache_subdir=""
+)
+
+dataset_dir = os.path.join(os.path.dirname(dataset), "aclImdb")
+
+train_dir = os.path.join(dataset_dir, "train")
+
+# remove unused folders to make it easier to load the data
+# remove_dir = os.path.join(train_dir, "unsup")
+# shutil.rmtree(remove_dir)
+"""
+pos_train_folder = (
+    "/home/hugo/hugo/Stage//data/data_IMDB/aclImdb/train/pos/"
+)
+neg_train_folder = (
+    "/home/hugo/hugo/Stage/data/data_IMDB/aclImdb/train/neg/"
+)
+
+
+def Data():
     X_train = []
     y_train = []
 
@@ -47,10 +64,10 @@ def load_data_IMDB():
     y_test = []
 
     pos_test_folder = (
-        "data/data_IMDB/aclImdb/test/pos/"
+        "/home/hugo/hugo/Stage/data/data_IMDB/aclImdb/test/pos/"
     )
     neg_test_folder = (
-        "data/data_IMDB/aclImdb/test/neg/"
+        "/home/hugo/hugo/Stage/data/data_IMDB/aclImdb/test/neg/"
     )
 
     for filename in os.listdir(pos_test_folder):
@@ -76,19 +93,19 @@ def load_data_IMDB():
 
     X_test = data["text"].to_numpy()
     y_test = data["class"].to_numpy()
-    y_train = np.asarray(y_train).astype("int")
+
     return X_train, X_test, y_train, y_test
 
 
-
-if __name__ == "__main__":
-  X_train, X_test, y_train, y_test = load_data_IMDB()
-  print(X_train.shape)
-  print(X_test.shape)
-  print(y_train.shape)
-  print(y_test.shape)
-
-  print(type(X_train))
-  print(type(y_train))
+X_train, X_test, y_train, y_test = Data()
 
 
+X_train = tf.convert_to_tensor(X_train)
+
+y_train = np.asarray(y_train).astype("int")
+y_train = tf.convert_to_tensor(y_train)
+
+X_test = tf.convert_to_tensor(X_test)
+
+y_test = np.asarray(y_test).astype("int")
+y_test = tf.convert_to_tensor(y_test)

@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 def create_model_Bostonhouse():
     model_Bostonhouse = tf.keras.Sequential(
         [
@@ -11,5 +12,12 @@ def create_model_Bostonhouse():
         ]
     )
 
-    return model_Bostonhouse,"mean_squared_error",tf.keras.optimizers.RMSprop(learning_rate=0.01),tf.keras.metrics.MeanSquaredError(),
+    model_Bostonhouse.compile(
+        metrics=[tf.keras.metrics.MeanSquaredError()],
+        loss="mean_squared_error",
+        optimizer=tf.keras.optimizers.RMSprop(learning_rate=0.01),
+    )
+    return model_Bostonhouse
 
+
+create_model_Bostonhouse()

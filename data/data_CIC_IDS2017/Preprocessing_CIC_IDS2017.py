@@ -1,11 +1,9 @@
-from re import X
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
-from copy import deepcopy
+import tensorflow as tf
 
-
-PATH = "/home/hugo/hugo/Stage/Mise_au_propre/data/data_CIC_IDS2017/"
+PATH = "/home/hugo/hugo/Stage/data/data_CIC_IDS2017/"
 df_1 = pd.read_csv(PATH + "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX_unbalanced.csv")
 df_2 = pd.read_csv(PATH + "Monday-WorkingHours.pcap_ISCX_unbalanced.csv")
 df_3 = pd.read_csv(PATH + "Tuesday-WorkingHours.pcap_ISCX_unbalanced.csv")
@@ -23,7 +21,7 @@ df_8 = pd.read_csv(PATH + "Friday-WorkingHours-Morning.pcap_ISCX_unbalanced.csv"
 
 
 list_df = [df_1, df_2, df_3, df_4, df_5, df_6, df_7, df_8]
-centralized_df = df = pd.concat(
+df = pd.concat(
     [
         df_1,
         df_2,
@@ -36,6 +34,8 @@ centralized_df = df = pd.concat(
     ]
 )
 
+df["Label"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
+
 excluded = [
     "Flow ID",
     "Source IP",
@@ -47,54 +47,34 @@ excluded = [
     "Init_Win_bytes_forward",
 ]
 
-# print(centralized_df['Label'].head())
-centralized_df = centralized_df.drop(columns=excluded + ["Timestamp"], errors="ignore")
-# print(centralized_df.columns)
-centralized_df["Label"] = centralized_df["Label"].apply(
-    lambda x: 0 if x == "BENIGN" else 1
-)
 
-y_centralized = centralized_df["Label"].values
-X_centralized = centralized_df.drop(columns=["Label"])
+y = df["Label"]
+X = df.drop(columns=["Label"])
+
+print(df["Label"].value_counts()) 
 
 (
-    X_train_centralized,
-    X_test_centralized,
-    y_train_centralized,
-    y_test_centralized,
-) = train_test_split(X_centralized, y_centralized, test_size=0.0001)
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+) = train_test_split(X, y, test_size=0.2)
 
 
-print(X_train_centralized.shape)
 
-# Create the set for the centralized version
-X_train_centralized = np.asarray(X_train_centralized).astype("int32")
-X_test_centralized = np.asarray(X_test_centralized).astype("int32")
-
-# Create the training and testing Set for the federated version
-train_df = pd.DataFrame()
-test_df = pd.DataFrame()
-
-for df in list_df:
-    df["Label"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
-    columns_name = df.columns
-    y = pd.DataFrame(df["Label"].values, columns=["Label"])
-    X_t = df.drop(columns=["Label"])
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_t, y, test_size=0.05, random_state=42
-    )
-    train = X_train
-    train["Label"] = y_train
-
-    test = X_test
-    test["Label"] = y_test
-
-    train_df = pd.concat([train_df, train])
-    test_df = pd.concat([test_df, test])
+train_df = pd.concat([X_train, y_train], axis=1)
+test_df = pd.concat([X_test, y_test], axis=1)
 
 
-federated_set = deepcopy(train_df)
-centralized_set = deepcopy(train_df)
+train_centralized_df = train_df.drop(columns=excluded + ["Timestamp"], errors="ignore")
+test_centralized_df = test_df.drop(columns=excluded + ["Timestamp"], errors="ignore")
+
+
+y_train_centralized = np.array(train_centralized_df["Label"].values)
+X_train_centralized = np.array(train_centralized_df.drop(columns=["Label"]))
+
+y_test_centralized = np.array(test_centralized_df["Label"].values)
+X_test_centralized = np.array(test_centralized_df.drop(columns=["Label"]))
 
 Web_server_16_Public = pd.concat(
     [
@@ -108,6 +88,13 @@ Ubuntu_server_12_Public = pd.concat(
         train_df[train_df["Destination IP"] == "205.174.165.66"],
     ]
 )
+Firewall = pd.concat(
+        [
+        train_df[train_df["Destination IP"] == "205.174.165.80"],
+        train_df[train_df["Destination IP"] == "172.16.0.1"]
+            
+        ])
+
 Ubuntu_14_4_32B = train_df[train_df["Destination IP"] == "192.168.10.19"]
 Ubuntu_14_4_64B = train_df[train_df["Destination IP"] == "192.168.10.17"]
 Ubuntu_16_4_32B = train_df[train_df["Destination IP"] == "192.168.10.16"]
@@ -120,8 +107,8 @@ Win_10_64B = train_df[train_df["Destination IP"] == "192.168.10.15"]
 MACe = train_df[train_df["Destination IP"] == "192.168.10.25"]
 
 Insiders = [
+    Firewall,
     Web_server_16_Public,
-    Ubuntu_server_12_Public,
     Ubuntu_14_4_32B,
     Ubuntu_14_4_64B,
     Ubuntu_16_4_32B,
@@ -134,7 +121,7 @@ Insiders = [
     MACe,
 ]
 
-
+# Keep only the data in the TimeStamp
 for i in range(len(Insiders)):
     Insiders[i] = Insiders[i].drop(columns=excluded, errors="ignore")
 
@@ -142,6 +129,7 @@ for i in range(len(Insiders)):
         lambda x: x[1] if x[1] != "/" else x[0]  # Only keep the day
     )
 
+# Regroup for each client data per day
 Data_per_day = []
 for i in range(len(Insiders)):
     # print(len(Insiders[i]["Timestamp"].unique())) results = 5 so 5 days
@@ -150,6 +138,7 @@ for i in range(len(Insiders)):
         Day_separation.append(Insiders[i][Insiders[i]["Timestamp"] == j])
     Data_per_day.append(Day_separation)
 
+# Create a set which is constitue of data per client & per day 
 Set = []
 for i in range(len(Data_per_day)):
     Set_i = []
@@ -157,23 +146,67 @@ for i in range(len(Data_per_day)):
         Data_per_day[i][j] = Data_per_day[i][j].drop(
             columns="Timestamp", errors="ignore"
         )
-        y = Data_per_day[i][j]["Label"].values
-        X_t = Data_per_day[i][j].drop(columns=["Label"])
-
-        X_t = np.array(X_t)
-        y = np.array(y)
+        y = np.array(Data_per_day[i][j]["Label"].values)
+        X_t = np.array(Data_per_day[i][j].drop(columns=["Label"]))
         Set_i.append([X_t, y])
     Set.append(Set_i)
+# i for client, j for day, 0 for X and 1 for y
+
+import tensorflow as tf
 
 
+if __name__ == "__main__":
+    print(len(Set))
+    print(len(Set[0]))
+    print(len(Set[0][0]))
+    """
+    def create_model_CIC_IDS2017():
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Flatten(input_shape=(74,)),
+                tf.keras.layers.Dense(512, activation="relu"),
+                tf.keras.layers.Dense(1024, activation="relu"),
+                tf.keras.layers.Dense(512, activation="relu"),
+                tf.keras.layers.Dense(1, activation="sigmoid"),
+            ]
+        )
 
-print("Number of PC : "+  str(len(Set)))
-print("Number of day : " + str(len(Set[0])))
-print("X & y : " + str(len(Set[0][0])))
-print("size of X : " + str(len(Set[0][0][0])))
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(),
+            loss=tf.keras.losses.BinaryCrossentropy(),
+            metrics=["accuracy"],
+        )
+
+        return model
+    """
+    
+    """
+    from tensorflow.keras import Model, Sequential, Input, backend
+    from tensorflow.keras.layers import LSTM, Dense, Dropout
+    from tensorflow.keras.callbacks import EarlyStopping
 
 
-for i in range(12):
-    for j in range(5):
-        for k in range(len(Set[i][j])):
-            print(len(Set[i][j][k]))
+    def create_model_CIC_IDS2017():
+        model = Sequential()
+        model.add(Input(shape=(None,74 )))
+        model.add(LSTM(units=30))
+        model.add(Dropout(0.2))
+        model.add(Dense(1, activation="sigmoid", name="sigmoid"))
+        model.compile(loss=tf.keras.losses.BinaryCrossentropy(), optimizer='Adam',
+            metrics = ["accuracy"])
+        return model
+    model = create_model_CIC_IDS2017()
+    for i in range(len(Set)):
+        for j in range(len(Set[i])):
+            print((i, j))
+            print("X size : " + str(Set[i][j][0].shape) + "y size" + str(len(Set[i][j][1])))
+            print(type(X))
+            Set[i][j][0] = tf.reshape(Set[i][j][0], (Set[i][j][0].shape[0],1,Set[i][j][0].shape[1]) )
+            model.fit(
+                Set[i][j][0],
+                Set[i][j][1],
+                epochs=1,
+                validation_data=(X_test_centralized, y_test_centralized),
+            )
+
+    """

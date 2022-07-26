@@ -41,8 +41,8 @@ def create_curves(experience_path):
     for component in list(dictonnary.keys()):
         if "client_" in component:
             dictonnary[component]["duration"] = dictonnary["server"]["duration"]
-        print(component)
-        print(dictonnary[component])
+        #print(component)
+        #print(dictonnary[component])
         metrics = dictonnary[component]["metrics"]
         duration = dictonnary[component]["duration"]
         #print(duration)
@@ -50,6 +50,9 @@ def create_curves(experience_path):
         y = []
         for element in metrics:
             y.append(element[1])
+        print(component)
+        print("duration :",duration)
+        print("y :",y)
         plt.plot(duration, y, label=component)
 
         if "JS" in experience_path:
@@ -59,9 +62,12 @@ def create_curves(experience_path):
             #ax.set_ylim([0,100])
             plt.yscale("log")
         if "CIC_IDS" in experience_path:
-            plt.legend(["server","centralized","Firewall","Web_server_public","Ubuntu_server_public","Ubuntu_14_32","Ubuntu_14_64","Ubuntu_16_32","Ubuntu_16_64","Win_7","Win_8","Win_Vista","Win_10_32","Win_10_64","MACe"])
+            #plt.legend(["server","centralized","Firewall","Web_server_public","Ubuntu_server_public","Ubuntu_14_32","Ubuntu_14_64","Ubuntu_16_32","Ubuntu_16_64","Win_7","Win_8","Win_Vista","Win_10_32","Win_10_64","MACe"])
+            plt.legend(["server","centralized","Web_server_public","Ubuntu_server_public","Ubuntu_14_32","Ubuntu_14_64","Ubuntu_16_32","Ubuntu_16_64","Win_7","Win_8","Win_Vista","Win_10_32","Win_10_64",])
         # plt.legend()
 
-    fig.savefig(experience_path + "/metric_with_all_client.jpg")
-#create_curves("CIFAR10/CIFAR10_FedAvg_clients_7_rounds_50_20220706174313")
+    fig.savefig(experience_path + "/metric_with_all_client.png")
+    fig.savefig(experience_path + "/metric_with_all_client.svg")
+
+create_curves("IMDB_FedAvg_clients_5_rounds_100_20220722140017/")
 
