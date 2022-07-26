@@ -3,11 +3,10 @@
 
 class FLModel() :
     def __init__(self,dataset):
-
         if dataset == "IMDB":
             from .model_IMDB import create_model_IMDB
             self.model, self.loss, self.optimizer, self.metrics  = create_model_IMDB()
-
+        
         if dataset == "MNIST":
             print("Loading model")
             from .model_MNIST import create_model_MNIST

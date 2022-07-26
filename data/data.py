@@ -13,3 +13,5 @@ class DataFactory():
       
       return X_train, X_test, y_train, y_test  
       
+
+# Change it to use a notion of set ? -> So we don't have to do a special case for CIC_IDS
