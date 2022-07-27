@@ -1,18 +1,21 @@
-# Stage
+# Internship - Federated Learning Benchmark
 
-# Motives
+### Motives
 
 Generate benchmark to compare the performance of federated learning and centralized learning on various Dataset
 
-# Dataset
+### Dataset
 
-Done : - MNIST <br/> - CIFAR10 <br/> - DisasterTweets <br/> - BigQoe (=JS) <br/>
+:white_check_mark: MNIST <br/>
+:white_check_mark: CIFAR10 <br/>
+:white_check_mark: DisasterTweets <br/>
+:white_check_mark: BigQoe (=JS) <br/>
 
-# Add your own dataset :
+### Add your own dataset :
 
 To add your own dataset to test, you have to follow the next two steps.
 
-Steps 1 : Add your data folder
+- Steps 1 : Add your data folder
 
 data
 |
@@ -23,7 +26,7 @@ data
 -> Create Function : Preprocessing*"name_of_your_dataset".py : you need a function called load_data\*"name_of_your_dataset" that will
 return X_train, X_test, y_train, y_test.
 
-Steps 2 : Add your model file
+- Steps 2 : Add your model file
 
 model
 |
