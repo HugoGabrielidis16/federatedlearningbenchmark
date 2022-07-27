@@ -1,8 +1,8 @@
-import tensorflow as tf 
+import tensorflow as tf
 
 
 def create_model_MNIST():
-    model_MNIST = tf.keras.Sequential(
+    model = tf.keras.Sequential(
         [
             tf.keras.layers.Input(shape=(28, 28, 1)),
             # tf.keras.layers.Rescaling(scale=1.0 / 255), Rescaling already done in the Preprocessing part
@@ -15,12 +15,8 @@ def create_model_MNIST():
             tf.keras.layers.Dense(10, activation="softmax"),
         ]
     )
+    loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    optimizer = tf.keras.optimizers.Adam()
+    metrics = tf.keras.metrics.SparseCategoricalAccuracy()
 
-
-    
-    return (model_MNIST, 
-            tf.keras.losses.SparseCategoricalCrossentropy(),
-            tf.keras.optimizers.Adam(),
-            tf.keras.metrics.SparseCategoricalAccuracy())
-
-
+    return model, loss, optimizer, metrics

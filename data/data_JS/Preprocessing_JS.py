@@ -30,6 +30,7 @@ def load_data_JS():
     )
     return X_train, X_test, y_train, y_test
 
+
 if __name__ == "__main__":
-  X_train, X_test, y_train, y_test = Data()
-  print(len(X_train))
+    X_train, X_test, y_train, y_test = load_data_JS()
+    print(len(X_train))

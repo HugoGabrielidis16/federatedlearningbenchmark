@@ -65,7 +65,7 @@ def main() -> None:
     model_ = FLModel(args.Dataset)
     loss = model_.loss
     optimizer = model_.optimizer
-    metrics_ = [model_.metrics]
+    metrics_ = model_.metrics
 
     model_centralized = tf.keras.models.clone_model(model_)
     model_centralized.compile(loss=loss, optimizer=optimizer, metrics=metrics_)
