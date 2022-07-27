@@ -10,7 +10,7 @@ def create_model_CIFAR10():
     )
 
     for layer in Resnet.layers:
-        layer.trainable = True
+        layer.trainable = False
 
     inputs = tf.keras.layers.Input(shape=(32, 32, 3))
     x = Resnet(inputs)
@@ -26,3 +26,7 @@ def create_model_CIFAR10():
     metrics = [tf.keras.metrics.SparseCategoricalAccuracy()]
 
     return model, loss, optimizer, metrics
+
+if __name__ == "__main__":
+  model, _, _ , _ = create_model_CIFAR10()
+  model.summary()

@@ -10,7 +10,7 @@ from multiprocessing import Process
 from centralized import Centralized
 from federated.federated import Federated
 from model.model import FLModel
-from data.data import Data
+from data.data import DataFactory
 from results.load_result import create_curves
 
 
@@ -24,7 +24,7 @@ Creating the results curves at the end of both experiments.
 """
 
 
-def main() -> None:
+def define_parser():
     parser = argparse.ArgumentParser(description="Flower")
 
     parser.add_argument("--nbr_clients", type=int, required=True)
@@ -44,46 +44,64 @@ def main() -> None:
     parser.add_argument("--accumulated_data", type=str)
     parser.add_argument("--centralized_percentage", type=float)
     args = parser.parse_args()
-    directory_name = f"results/{args.Dataset}/{args.strategy}/{args.nbr_clients}_clients{args.nbr_rounds}_rounds_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    return args
 
+
+def create_directory(args):
+    """
+    Create the directory
+    """
+    directory_name = f"results/{args.Dataset}/{args.strategy}/{args.nbr_clients}_clients{args.nbr_rounds}_rounds_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
     try:
         os.mkdir(directory_name)
     except:
         pass
+    return directory_name
 
-    model_ = FLModel(args.Dataset)
+
+def load_model(name):
+    """
+    Load the model and the diffrents parameters needed to compile it < use that since there are issue
+    cloning already compiled model using keras >
+    """
+    model_ = FLModel(name)
+    model = model_.model
     loss = model_.loss
     optimizer = model_.optimizer
-    metrics_ = model_.metrics
+    metrics = model_.metrics
 
-    model_centralized = tf.keras.models.clone_model(model_)
-    model_centralized.compile(loss=loss, optimizer=optimizer, metrics=metrics_)
+    return model, loss, optimizer, metrics
 
-    model_federated = tf.keras.models.clone_model(model_)
 
-    dataset = Data(args.Dataset)
+def main() -> None:
+    args = define_parser()
+    directory_name = create_directory(args=args)
+    model, loss, optimizer, metrics = load_model(args.Dataset)
+
+    dataset = DataFactory().load_data(args.Dataset, args.nbr_clients, args.nbr_rounds)
     dataset_name = args.Dataset
-    graph = tf.get_default_graph()
-    # """
+
     print(
         "-------------------" * 5 + " Start of Centralized " + "-------------------" * 5
     )
     start_centralized = time.time()
     centralized_run = Centralized(
-        model=model_centralized,
-        data=dataset,
+        dataset=dataset,
         directory_name=directory_name,
         nbr_rounds=args.nbr_rounds,
         nbr_clients=args.nbr_clients,
         accumulated_data=eval(args.accumulated_data),
         percentage=args.centralized_percentage,
+        model=model,
+        loss=loss,
+        optimizer=optimizer,
+        metrics=metrics,
     )
 
     centralized_run.run()
     end_centralized = time.time()
-    print
+    print()
     print(f"Runtime of centralized is {end_centralized - start_centralized}")
-    # """
     print()
     print("-------------------" * 5 + "Start of Federated" + "-----------------" * 5)
     federated_run = Federated(
@@ -94,9 +112,10 @@ def main() -> None:
         nbr_clients=args.nbr_clients,
         strategy=args.strategy,
         accumulated_data=eval(args.accumulated_data),
+        model=model,
         loss=loss,
         optimizer=optimizer,
-        metrics=metrics_,
+        metrics=metrics,
     )
     start_federated = time.time()
     federated_run.run()

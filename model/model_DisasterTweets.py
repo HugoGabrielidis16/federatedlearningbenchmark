@@ -90,7 +90,7 @@ def create_model_DisasterTweets():
     def build_classifier_model():
         text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name="text")
         preprocessing_layer = hub.KerasLayer(
-            tfhub_handle_preprocess, name="preprocessing"
+            tfhub_handle_preprocess, name="Bert_preprocess"
         )
         encoder_inputs = preprocessing_layer(text_input)
         encoder = hub.KerasLayer(
@@ -110,3 +110,8 @@ def create_model_DisasterTweets():
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
 
     return classifier_model,loss, optimizer, metrics
+
+if __name__ == "__main__":
+  model, _, _ , _ = create_model_DisasterTweets()
+  model.summary()
+

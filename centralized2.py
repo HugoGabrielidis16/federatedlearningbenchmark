@@ -1,12 +1,8 @@
 import pickle
-from pickletools import optimize
 import time
-from sklearn import metrics
 import tensorflow as tf
 import numpy as np
 from multiprocessing import Process
-
-# tf.disable_v2_behavior()
 from data.data import DataFactory
 
 """
@@ -25,13 +21,9 @@ class Centralized(Process):
         directory_name,
         accumulated_data,
         percentage,
-        loss,
-        optimizer,
-        metrics=metrics,
     ):
         super(Centralized, self).__init__()
-        self.model = tf.keras.clone_model(model)
-        self.model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
+        self.model = tf.keras.models.clone_model(model)
         self.X_train, self.X_test, self.y_train, self.y_test = DataFactory.load_data(
             dataset, nbr_clients, nbr_rounds, percentage
         )

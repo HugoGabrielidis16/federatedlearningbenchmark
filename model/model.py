@@ -11,4 +11,4 @@ class FLModel:
     def __init__(self, dataset):
         self.model, self.loss, self.optimizer, self.metrics = eval(
             f"create_model_{dataset}"
-        )
+        )()
