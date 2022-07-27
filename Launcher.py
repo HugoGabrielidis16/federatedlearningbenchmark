@@ -1,28 +1,27 @@
-from multiprocessing import Process
 import os
-import sys
 import argparse
-import traceback
-import signal
 import datetime
 import time
-from copy import deepcopy
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 import warnings
+from multiprocessing import Process
 
-warnings.filterwarnings("ignore")
 
-from centralized.centralized import Centralized
+from centralized import Centralized
 from federated.federated import Federated
 from model.model import FLModel
 from data.data import Data
-import FLconfig
-
-
-tf.disable_v2_behavior()
-
-
 from results.load_result import create_curves
+
+
+warnings.filterwarnings("ignore")
+
+
+"""
+Launcher file that will launch both experiment : Centraized
+and Federated.
+Creating the results curves at the end of both experiments.
+"""
 
 
 def main() -> None:
@@ -45,18 +44,8 @@ def main() -> None:
     parser.add_argument("--accumulated_data", type=str)
     parser.add_argument("--centralized_percentage", type=float)
     args = parser.parse_args()
-    directory_name = (
-        "results/"
-        + args.Dataset
-        + "_"
-        + args.strategy
-        + "_clients_"
-        + str(args.nbr_clients)
-        + "_rounds_"
-        + str(args.nbr_rounds)
-        + "_"
-        + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    )
+    directory_name = f"results/{args.Dataset}/{args.strategy}/{args.nbr_clients}_clients{args.nbr_rounds}_rounds_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+
     try:
         os.mkdir(directory_name)
     except:
@@ -73,7 +62,6 @@ def main() -> None:
     model_federated = tf.keras.models.clone_model(model_)
 
     dataset = Data(args.Dataset)
-    metrics = take_metrics(args.Dataset)
     dataset_name = args.Dataset
     graph = tf.get_default_graph()
     # """
@@ -87,10 +75,8 @@ def main() -> None:
         directory_name=directory_name,
         nbr_rounds=args.nbr_rounds,
         nbr_clients=args.nbr_clients,
-        metrics=metrics,
         accumulated_data=eval(args.accumulated_data),
         percentage=args.centralized_percentage,
-        graph=graph,
     )
 
     centralized_run.run()
@@ -111,7 +97,6 @@ def main() -> None:
         loss=loss,
         optimizer=optimizer,
         metrics=metrics_,
-        graph=graph,
     )
     start_federated = time.time()
     federated_run.run()
