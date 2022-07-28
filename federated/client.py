@@ -35,8 +35,10 @@ class Client(fl.client.NumPyClient):
         return self.model.get_weights()
 
     def fit(self, parameters, config):
-        """Fit model and return new weights as well as number of training
-        examples."""
+        """
+        Fit model and return new weights as well as number of training
+        examples.
+        """
         self.model.set_weights(parameters)
         # Remove steps_per_epoch if you want to train over the full dataset
         # https://keras.io/api/models/model_training_apis/#fit-method

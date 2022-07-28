@@ -61,7 +61,7 @@ def evaluate_config(rnd: int):
     return {"val_steps": val_steps}
 
 
-class FedAvg(fl.server.strategy.FedAvg, Process):
+class FedAvg(Process):
     def __init__(self, model, X_test, y_test, nbr_clients, nbr_rounds, directory_name):
 
         super(FedAvg, self).__init__()
@@ -116,4 +116,4 @@ class FedAvg(fl.server.strategy.FedAvg, Process):
             "[::]:8080", config={"num_rounds": self.nbr_rounds}, strategy=strategy
         )
 
-        self.saving()
+        # self.saving()

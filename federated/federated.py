@@ -1,18 +1,12 @@
 import flwr as fl
 import time
-import tensorflow.compat.v1 as tf
-from copy import copy, deepcopy
+import tensorflow as tf
 from multiprocessing import Process
 from federated.server.FedAvg import FedAvg
 from federated.server.FedAdam import FedAdam
 from federated.server.FedYogi import FedYogi
 import pickle
 from .client import Client
-from model.model import FLModel
-from data.data import DataFactory
-import tensorflow.compat.v1.keras.backend as K
-
-tf.disable_v2_behavior()
 
 """
 session = tf.compat.v1.Session(graph = tf.Graph() )
@@ -49,6 +43,7 @@ class Federated:
         self.loss = loss
         self.optimizer = optimizer
         self.metrics = metrics
+        self.process = []
 
     def start_server(
         self,
@@ -70,7 +65,9 @@ class Federated:
             self.nbr_rounds,
             self.directory_name,
         ]
-        server = eval(self.strategy)(*arguments)
+        server_process = Process(target=eval(self.strategy), args=arguments)
+        server_process.start()
+        self.process.append(server_process)
 
     def start_client(
         self,
@@ -107,24 +104,21 @@ class Federated:
         Run the experience, with the server and each clients as a subprocess. The results will be dump in
         a pickle for each one
         """
-        process = []
-
-        server_process = Process(
-            target=self.start_server,
-        )
-        server_process.start()
-        process.append(server_process)
+        self.start_server()
         time.sleep(3)
 
         # Create partition for each client
-        for i in range(self.nbr_clients):
-            print("i : " + str(i) + ", size of X_train : " + str(len(self.X_train)))
+        for client in range(self.nbr_clients):
+            print(
+                "i : " + str(client) + ", size of X_train : " + str(len(self.X_train))
+            )
             Client_i = Process(
                 target=self.start_client,
-                args=(self.X_train[i], self.y_train[i], i),
+                args=(self.X_train[client], self.y_train[client], client),
             )
-            Client_i.start()
-            process.append(Client_i)
 
-        for subprocess in process:
+            Client_i.start()
+            self.process.append(Client_i)
+
+        for subprocess in self.process:
             subprocess.join()

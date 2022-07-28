@@ -5,7 +5,6 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from flwr.server.strategy import FedAvg
 import pickle
 from flwr.server.client_proxy import ClientProxy
-from flwr.common import EvaluateRes
 from copy import deepcopy
 
 
