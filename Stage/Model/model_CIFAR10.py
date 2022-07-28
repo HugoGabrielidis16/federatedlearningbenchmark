@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+from tensorflow.keras import layers
 
 def create_model_CIFAR10():
     Resnet = tf.keras.applications.ResNet50(
@@ -8,8 +8,16 @@ def create_model_CIFAR10():
 
     for layer in Resnet.layers:
         layer.trainable = False
-
+  
     inputs = tf.keras.layers.Input(shape=(32, 32, 3))
+    """
+    x = tf.keras.Sequential([
+      layers.RandomFlip("horizontal_and_vertical"),
+      layers.RandomRotation(0.2),
+        ])(inputs)
+
+    """
+
     x = Resnet(inputs)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = tf.keras.layers.Flatten()(x)

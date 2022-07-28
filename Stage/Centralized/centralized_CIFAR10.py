@@ -1,74 +1,102 @@
-def run_centralized_CIFAR10(epochs, nbr_clients, directory_name):
+def partitioning(X_train, y_train,nbr_clients, epochs,accumulated_data,):
+        print(epochs)
+        import numpy as np
+        """
+        Partition the training samples 
+        """
+        X_train_epochs_client = [ [] for i in range(epochs)]
+        y_train_epochs_client = [ [] for i in range(epochs) ]
+        for i in range(nbr_clients):
+            X_train_clients = X_train[
+                    int( (i / nbr_clients) * len(X_train) ) :
+                    int( ( ((i +1)/nbr_clients)) * len(X_train ))
+                    ]
+            y_train_clients = y_train[
+                    int( (i / nbr_clients) * len(y_train) ) :
+                    int( ( ((i +1)/nbr_clients)) * len(y_train ))
+                    ]
+            for epoch in range(epochs):
+                X_train_client_epoch = X_train_clients[
+                    int( ( epoch / epochs) * len(X_train_clients) ):
+                    int( ((epoch +1)/epochs) * len(X_train_clients) )
+                ]
+                y_train_client_epoch = y_train_clients[
+                    int( ( epoch / epochs) * len(y_train_clients) ):
+                    int( ((epoch +1)/epochs) * len(y_train_clients) )
+                ]
+                #print(len(X_train_client_epoch))
+                X_train_epochs_client[epoch].append(X_train_client_epoch)
+                y_train_epochs_client[epoch].append(y_train_client_epoch)
+
+        X_train_epochs = []
+        y_train_epochs = []
+        print()
+        print(np.array(X_train_epochs_client).shape) 
+        
+
+        for epoch in range(epochs):
+            if accumulated_data:
+              X_t = X_train_epochs_client[0][0]
+              y_t = y_train_epochs_client[0][0]
+              for k in range(epoch+1):
+                for j in range(nbr_clients):
+                  if (k != 0) | (j != 0): # we skip the first epoch of the first clients since it is already in the concat
+                    X_t = np.concatenate([X_t, X_train_epochs_client[k][j]], 0)
+                    y_t = np.concatenate([y_t, y_train_epochs_client[k][j]], 0)
+
+            else :
+              X_t = X_train_epochs_client[epoch][0]
+              y_t = y_train_epochs_client[epoch][0]
+              
+              for i in range(1,nbr_clients):
+                print(len(X_train_epochs_client[epoch][i]))
+                print(i)
+                X_t = np.concatenate([X_t, X_train_epochs_client[epoch][i]], 0)
+                y_t = np.concatenate([y_t, y_train_epochs_client[epoch][i]], 0) 
+            print(X_t.shape) 
+            X_train_epochs.append(X_t)
+            y_train_epochs.append(y_t)
+
+        return X_train_epochs, y_train_epochs
+
+
+def run_centralized_CIFAR10(epochs, nbr_clients, directory_name, accumulated_data,percentage):
     import pickle
     from Model.model_CIFAR10 import create_model_CIFAR10
-    from data.data_CIFAR10.Preprocessing_CIFAR10 import X_train, X_test, y_test, y_train
+    from data.data_CIFAR10.Preprocessing_CIFAR10 import (
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+    )
     import tensorflow as tf
     import time
 
-    model = create_model_CIFAR10()
 
-    # print(len(X_train) / 33)
-    X_train_epochs = [[] for w in range(epochs)]
-    y_train_epochs = [[] for w in range(epochs)]
-    all_history = {
-        "loss": [],
-        "val_loss": [],
-        "val_sparse_categorical_accuracy": [],
-        "sparse_categorical_accuracy": [],
-    }
-    for i in range(nbr_clients):
-        X_train_i = X_train[
-            int((i / nbr_clients) * len(X_train)) : int(
-                ((i + 1) / nbr_clients) * len(X_train)
-            )
-        ]
-        y_train_i = y_train[
-            int((i / nbr_clients) * len(y_train)) : int(
-                ((i + 1) / nbr_clients) * len(y_train)
-            )
-        ]
-        # So each client have a different dataset to train on
-        for actual_rnd in range(epochs):
-            X_train_i_actual_rnd = X_train_i[
-                int((actual_rnd / epochs) * len(X_train_i)) : int(
-                    ((actual_rnd + 1) / epochs) * len(X_train_i)
-                )
-            ]
-            y_train_i_actual_rnd = y_train_i[
-                int((actual_rnd / epochs) * len(y_train_i)) : int(
-                    ((actual_rnd + 1) / epochs) * len(y_train_i)
-                )
-            ]
-            X_train_epochs[actual_rnd].append(X_train_i_actual_rnd)
-            y_train_epochs[actual_rnd].append(y_train_i_actual_rnd)
-
- 
+    X_train = X_train[:int(len(X_train)*percentage)]
+    y_train = y_train[:int(len(y_train)*percentage)]
+    print('percentage of data used :' +str(percentage) + ' size of train data : ' + str(len(X_train) ))
+    print("Accumulated data : " + str(accumulated_data))
     duration = []
-   
-    for i in range(epochs):
-        X_t = X_train_epochs[i][0]
-        y_t = y_train_epochs[i][0]
-       
-     
-        for j in range(1, len(X_train_epochs[i])):
-
-            X_t = tf.concat([X_t, X_train_epochs[i][j]], 0)
-            y_t = tf.concat([y_t, y_train_epochs[i][j]], 0)
-
+    model = create_model_CIFAR10()
+    # print(len(X_train) / 32)
+    X_train, y_train = partitioning(X_train,y_train,nbr_clients , epochs ,accumulated_data)  
+    
+    list = []
+    for epoch in range(epochs):
+        print("Epoch : " + str(epoch))
         start = time.time()
-
         history = model.fit(
-            X_t, y_t, epochs=1, validation_data=(X_test, y_test), batch_size=32
+            X_train[epoch],
+            y_train[epoch],
+            epochs=1,
+            batch_size=1,
         )
+        testing_history = model.evaluate(X_test,y_test, batch_size = 64)
         end = time.time()
         duration.append(end - start)
-        for key in history.history.keys():
-            all_history[key].append(history.history[key])
-    list = []
-    for key in all_history.keys():
-        if "val" in key and "loss" not in key:  # ugly way to only select the metrics
-            for i in range(len(all_history[key])):
-                list.append((all_history[key][i], all_history[key][i]))
+        print("Duration : " + str(end-start))
+        list.append((testing_history[1], testing_history[1]))
 
     for i in range(len(duration) - 1):
         duration[i + 1] += duration[i]
@@ -77,4 +105,6 @@ def run_centralized_CIFAR10(epochs, nbr_clients, directory_name):
     with open(file_name, "wb") as f:
         pickle.dump(list, f)
         pickle.dump(duration, f)
+
+
 
