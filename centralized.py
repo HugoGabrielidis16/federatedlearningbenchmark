@@ -1,14 +1,12 @@
 import pickle
-from pickletools import optimize
 import time
-from sklearn import metrics
 import tensorflow as tf
 import numpy as np
 from multiprocessing import Process
 
 # tf.disable_v2_behavior()
-from data.data import DataFactory
 from tqdm import tqdm
+
 """
 Class that will Launch the centralized experiments
 The resulls will be stored in a pickle
@@ -27,7 +25,7 @@ class Centralized(Process):
         percentage,
         loss,
         optimizer,
-        metrics=metrics,
+        metrics,
     ):
         super(Centralized, self).__init__()
         self.model = tf.keras.models.clone_model(model)

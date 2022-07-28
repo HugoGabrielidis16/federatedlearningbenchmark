@@ -1,3 +1,3 @@
 # Download data
-!wget 
+cd 
 !wget

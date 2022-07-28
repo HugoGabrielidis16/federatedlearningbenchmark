@@ -16,3 +16,7 @@ def create_model_CIC_IDS2017():
     metrics = ["accuracy"]
 
     return model, loss, optimizer, metrics
+
+if __name__ == "__main__":
+  model, _, _, _ = create_model_CIC_IDS2017()
+  model.summary()

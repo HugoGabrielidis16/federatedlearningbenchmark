@@ -2,7 +2,7 @@
 
 ### Motives
 
-Generate benchmark to compare the performance of federated learning and centralized learning on various Dataset
+Generate benchmark to compare the performance of federated learning and centralized learning on various dataset
 
 ### Dataset
 
@@ -15,7 +15,7 @@ Generate benchmark to compare the performance of federated learning and centrali
 
 To add your own dataset to test, you have to follow the next two steps.
 
-- **Steps 1** : Add your data folder
+- **Steps 1** : Create your data folder
 
 data
 |
@@ -34,6 +34,6 @@ model
 |
 -> create_model*"name_of_your_dataset"
 
-### How to run it 
+### How to run it
 
 python3 Launcher.py --Dataset="Dataset" --strategy="stategy" --nbr_rounds="nbr-rounds" --nbr_clients="nbr-clients" --centralized_percentage="%" --accumulated_data="True/False"

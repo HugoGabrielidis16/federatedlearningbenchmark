@@ -49,7 +49,7 @@ class Federated:
         self,
     ):
         """
-        Start a process for the server, call the class associated to the strategy
+        Start a process for the server, call the class associated to the strategy.
         """
 
         print("start server function")
@@ -76,7 +76,8 @@ class Federated:
         client_nbr,
     ):
         """
-        Start a process for a single client with it associated dataset, dump the results in a pickle
+        Start a process for a single client with it associated dataset,
+        dump the results in a pickle.
         """
 
         print("Start client : " + str(client_nbr))
