@@ -17,7 +17,7 @@ def create_model_MNIST():
     )
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     optimizer = tf.keras.optimizers.Adam()
-    metrics = tf.keras.metrics.SparseCategoricalAccuracy()
+    metrics = [tf.keras.metrics.SparseCategoricalAccuracy()]
     return model, loss, optimizer, metrics
 
 

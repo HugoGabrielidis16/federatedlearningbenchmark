@@ -98,14 +98,13 @@ def main() -> None:
         metrics=metrics,
     )
 
-    centralized_run.run()
+    """ centralized_run.run() """
     end_centralized = time.time()
     print()
     print(f"Runtime of centralized is {end_centralized - start_centralized}")
     print()
     print("-------------------" * 5 + "Start of Federated" + "-----------------" * 5)
     federated_run = Federated(
-        dataset_name=dataset_name,
         data=dataset,
         directory_name=directory_name,
         nbr_rounds=args.nbr_rounds,

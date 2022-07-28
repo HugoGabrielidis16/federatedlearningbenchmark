@@ -8,7 +8,7 @@ from multiprocessing import Process
 
 # tf.disable_v2_behavior()
 from data.data import DataFactory
-
+from tqdm import tqdm
 """
 Class that will Launch the centralized experiments
 The resulls will be stored in a pickle
@@ -30,16 +30,17 @@ class Centralized(Process):
         metrics=metrics,
     ):
         super(Centralized, self).__init__()
-        self.model = tf.keras.clone_model(model)
+        self.model = tf.keras.models.clone_model(model)
         self.model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
-        self.X_train, self.X_test, self.y_train, self.y_test = DataFactory.load_data(
-            dataset, nbr_clients, nbr_rounds, percentage
-        )
-
+        self.X_train = dataset["X_train"]
+        self.X_test = dataset["X_test"]
+        self.y_train = dataset["y_train"]
+        self.y_test = dataset["y_test"]
         self.nbr_clients = nbr_clients
         self.epochs = nbr_rounds
         self.accumulated_data = accumulated_data
         self.directory_name = directory_name + "/centralized"
+        self.percentage = percentage
         self.metrics_list = []
 
         self.duration = []
@@ -60,7 +61,7 @@ class Centralized(Process):
         """
         X_train_epochs = []
         y_train_epochs = []
-        for epoch in range(self.epochs):
+        for epoch in tqdm(range(self.epochs)):
             X_t = self.X_train[epoch][0]
             y_t = self.y_train[epoch][0]
 
@@ -91,9 +92,6 @@ class Centralized(Process):
         for i in range(len(self.duration) - 1):
             self.duration[i + 1] += self.duration[i]
 
-        metrics_list = []
-        # To change and incorporate a list of val_metrics and val_loss
-
         with open(self.directory_name, "wb") as f:
             pickle.dump(self.metrics_list, f)
             pickle.dump(self.duration, f)
@@ -107,10 +105,18 @@ class Centralized(Process):
         for epoch in range(self.epochs):
             start = time.time()
 
-            history = self.model.fit(
-                (X_train_epochs[epoch]),
-                (y_train_epochs[epoch]),
+            X_train = X_train_epochs[epoch][
+                : int(len(X_train_epochs[epoch]) * self.percentage)
+            ]
+            y_train = y_train_epochs[epoch][
+                : int(len(y_train_epochs[epoch]) * self.percentage)
+            ]
+
+            self.model.fit(
+                X_train,
+                y_train,
                 batch_size=1,  # We choosed a batch_size of 1 for the training since some dataset doesn't have a lot of sample, and this effect would be accentuated when using a lot of epoch
+                epochs=1,
             )
             loss, metrics_used = self.model.evaluate(
                 self.X_test, self.y_test, batch_size=32, verbose=1

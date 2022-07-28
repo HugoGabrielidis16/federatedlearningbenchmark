@@ -55,8 +55,8 @@ class DataFactory:
                     )
                 ]
 
-            Set_X[client] = X_train_client_epoch
-            Set_y[client] = y_train_client_epoch
+                Set_X[client][epoch] = X_train_client_epoch
+                Set_y[client][epoch] = y_train_client_epoch
         return Set_X, Set_y
 
     def load_data(self, dataset, nbr_clients, nbr_rounds):
@@ -65,13 +65,14 @@ class DataFactory:
         to the number of clients and rounds
         """
 
-        arguments = [nbr_clients, nbr_rounds]
-        X_train, X_test, y_train, y_test = eval("load_data_" + dataset)(*arguments)
-        X_train, y_train = self.processing(X_train, y_train, nbr_clients, nbr_rounds)
+        X_train, X_test, y_train, y_test = eval(f"load_data_{dataset}")()
+        Set_X, Set_y = self.processing(X_train, y_train, nbr_clients, nbr_rounds)
+
+        print(len(Set_X[0][0]))
 
         return {
-            "X_train": X_train,
-            "y_train": y_train,
+            "X_train": Set_X,
+            "y_train": Set_y,
             "X_test": X_test,
             "y_test": y_test,
         }
