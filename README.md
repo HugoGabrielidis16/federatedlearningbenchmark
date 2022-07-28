@@ -33,3 +33,7 @@ model
 -> Create model*"name_of_your_dataset".py
 |
 -> create_model*"name_of_your_dataset"
+
+### How to run it 
+
+python3 Launcher.py --Dataset="Dataset" --strategy="stategy" --nbr_rounds="nbr-rounds" --nbr_clients="nbr-clients" --centralized_percentage="%" --accumulated_data="True/False"
