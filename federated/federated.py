@@ -7,6 +7,7 @@ from federated.server.FedAdam import FedAdam
 from federated.server.FedYogi import FedYogi
 import pickle
 from .client import Client
+import dill
 
 """
 session = tf.compat.v1.Session(graph = tf.Graph() )
@@ -97,8 +98,8 @@ class Federated:
         print("client started")
         fl.client.start_numpy_client("[::]:8080", client=client)
         filename = self.directory_name + "/client_number_" + str(client_nbr)
-        with open(filename, "wb") as f:
-            pickle.dump(client.metrics_list, f)
+        """ with open(filename, "wb") as f:
+            pickle.dump(client.metrics_list, f) """
 
     def run(self):
         """
