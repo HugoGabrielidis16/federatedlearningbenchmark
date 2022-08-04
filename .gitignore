@@ -1,3 +1,4 @@
+# Common extension to remove & large files 
 *.csv
 *.pyc
 *.swp

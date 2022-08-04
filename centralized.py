@@ -28,7 +28,9 @@ class Centralized(Process):
         metrics,
     ):
         super(Centralized, self).__init__()
+        # Load the model
         self.model = tf.keras.models.clone_model(model)
+        # Compile the model
         self.model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
         self.X_train = dataset["X_train"]
         self.X_test = dataset["X_test"]
@@ -40,7 +42,6 @@ class Centralized(Process):
         self.directory_name = directory_name + "/centralized"
         self.percentage = percentage
         self.metrics_list = []
-
         self.duration = []
 
     def partitioning(self):
