@@ -1,8 +1,5 @@
 import flwr as fl
 import tensorflow as tf
-import os
-import matplotlib.pyplot as plt
-from copy import deepcopy
 
 # from Launcher import timed
 
@@ -43,11 +40,15 @@ class Client(fl.client.NumPyClient):
         # Remove steps_per_epoch if you want to train over the full dataset
         # https://keras.io/api/models/model_training_apis/#fit-method
         if self.accumulated_data:
-            X_train_rnd = self.X_train[0 : self.actual_rnd]
-            y_train_rnd = self.y_train[0 : self.actual_rnd]
+            X_train_rnd = self.X_train[
+                : self.actual_rnd
+            ]  # takes samples from round 0 to actual round
+            y_train_rnd = self.y_train[: self.actual_rnd]
 
         else:
-            X_train_rnd = self.X_train[self.actual_rnd]
+            X_train_rnd = self.X_train[
+                self.actual_rnd
+            ]  # only takes samples from actual rounds
             y_train_rnd = self.y_train[self.actual_rnd]
 
         self.actual_rnd += 1

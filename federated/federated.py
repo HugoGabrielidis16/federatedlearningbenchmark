@@ -9,12 +9,6 @@ import pickle
 from .client import Client
 import dill
 
-"""
-session = tf.compat.v1.Session(graph = tf.Graph() )
-with session.graph.as_default():
-  tf.keras.backend.set_session(session)
-"""
-
 
 class Federated:
     def __init__(

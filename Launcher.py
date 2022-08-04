@@ -25,6 +25,16 @@ Creating the results curves at the end of both experiments.
 
 
 def define_parser():
+    """
+    Create the parser for the argument needed :
+        - Dataset
+        - strategy
+        - nbr_rounds
+        - nbr_clients
+        - accumulated_data
+        - centralized_percentage
+
+    """
     parser = argparse.ArgumentParser(description="Flower")
 
     parser.add_argument("--nbr_clients", type=int, required=True)

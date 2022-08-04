@@ -1,4 +1,3 @@
-from pickletools import optimize
 import tensorflow as tf
 
 
@@ -27,6 +26,7 @@ def create_model_CIFAR10():
 
     return model, loss, optimizer, metrics
 
+
 if __name__ == "__main__":
-  model, _, _ , _ = create_model_CIFAR10()
-  model.summary()
+    model, _, _, _ = create_model_CIFAR10()
+    model.summary()

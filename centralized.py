@@ -90,9 +90,10 @@ class Centralized(Process):
         for i in range(len(self.duration) - 1):
             self.duration[i + 1] += self.duration[i]
 
-        with open(self.directory_name, "wb") as f:
+        """ with open(self.directory_name, "wb") as f:
             pickle.dump(self.metrics_list, f)
             pickle.dump(self.duration, f)
+         """
 
     def run(self):
         """
