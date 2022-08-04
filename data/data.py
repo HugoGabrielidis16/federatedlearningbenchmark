@@ -65,6 +65,10 @@ class DataFactory:
         to the number of clients and rounds
         """
 
+        if dataset == "CIC_IDS2017":
+            Set = eval(f"load_data_{dataset}")()
+            return Set
+
         X_train, X_test, y_train, y_test = eval(f"load_data_{dataset}")()
         Set_X, Set_y = self.processing(X_train, y_train, nbr_clients, nbr_rounds)
 

@@ -79,7 +79,6 @@ def main() -> None:
     model, loss, optimizer, metrics = load_model(args.Dataset)
 
     dataset = DataFactory().load_data(args.Dataset, args.nbr_clients, args.nbr_rounds)
-    dataset_name = args.Dataset
 
     print(
         "-------------------" * 5 + " Start of Centralized " + "-------------------" * 5
