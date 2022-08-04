@@ -69,5 +69,5 @@ def create_curves(experience_path):
     fig.savefig(experience_path + "/metric_with_all_client.png")
     fig.savefig(experience_path + "/metric_with_all_client.svg")
 
-create_curves("IMDB_FedAvg_clients_5_rounds_100_20220722140017/")
+#create_curves("IMDB_FedAvg_clients_5_rounds_100_20220722140017/")
 

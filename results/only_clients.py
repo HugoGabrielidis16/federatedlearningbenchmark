@@ -42,5 +42,5 @@ def create_curves_clients(experience_path):
     fig.savefig(experience_path + "/only_clients.png")
     fig.savefig(experience_path + "/only_clients.svg")
 
-create_curves_clients("/home/hugo/hugo/Stage/results/25_07_2022/IMDB/non_accumulated/IMDB_FedAvg_clients_5_rounds_100_20220725173416/")
+#create_curves_clients("/home/hugo/hugo/Stage/results/25_07_2022/IMDB/non_accumulated/IMDB_FedAvg_clients_5_rounds_100_20220725173416/")
 

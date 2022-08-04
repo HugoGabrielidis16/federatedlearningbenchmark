@@ -27,7 +27,6 @@ from Centralized.centralized_MNIST_noiid import run_centralized_MNIST_noiid
 from Fed.federated_JS import run_JS
 from Fed.federated_CIFAR10 import run_CIFAR10
 from Fed.federated_MNIST import run_MNIST
-from Fed.federated_Shakespeare import run_Shakespeare
 from Fed.federated_CIC_IDS2017 import run_CIC_IDS2017
 from Fed.federated_DisasterTweets import run_DisasterTweets
 from Fed.federated_IMDB import run_IMDB
@@ -148,7 +147,7 @@ def main() -> None:
         directory_name,
         eval(args.accumulated_data),
     ]
-    #""" 
+    """ 
     print("-------------------" * 4 + "Start of Centralized" + "-----------------" * 4)
     start_centralized = time.time()
     centralized_process = Process(

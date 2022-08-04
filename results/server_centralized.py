@@ -53,5 +53,5 @@ def create_curves(experience_path):
     fig.savefig(experience_path + "/server_centralized.png")
     fig.savefig(experience_path + "/server_centralized.svg")
 
-create_curves("/home/hugo/hugo/Stage/results/25_07_2022/IMDB/non_accumulated/IMDB_FedAdam_clients_5_rounds_100_20220726011106/")
+#create_curves("/home/hugo/hugo/Stage/results/25_07_2022/IMDB/non_accumulated/IMDB_FedAdam_clients_5_rounds_100_20220726011106/")
 
