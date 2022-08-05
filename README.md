@@ -1,10 +1,19 @@
 # Internship - Federated Learning Benchmark
 
-### Motives
+### Context
 
-Generate benchmark to compare the performance of federated learning and centralized learning on various dataset
+In the context of my 6 month internship at Orange Innovation, my tutor and I focused on comparing federated and centralized Learning.
+Federated Learning is an apporach where instead of sending your data to the cloud where there could be confidentiality issue, you have the model on your own
+devices which is updated each "rounds" using everyone weights.
+This approach was created in 2017 by Google and has the advantages of being safer, doesn't require a constant connection, less latency.
+During my internship, we concentrated on seeing if all those advantages came with a trade off in performace.
 
-### Dataset
+### Results
+
+After experimentation we saw that if using the same model for both centralized & federated we achieved the same performance for both.
+And while the centralized approach was indeed faster it was still in the same order of magnitude.
+
+### Datasets
 
 :white_check_mark: MNIST <br/>
 :white_check_mark: CIFAR10 <br/>
