@@ -1,4 +1,3 @@
-import data
 from .model_IMDB import create_model_IMDB
 from .model_MNIST import create_model_MNIST
 from .model_DisasterTweets import create_model_DisasterTweets

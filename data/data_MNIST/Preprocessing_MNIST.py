@@ -13,8 +13,6 @@ def load_data_MNIST():
 
     return X_train, X_test, y_train, y_test
 
-    return X_train_epochs_client, y_train_epochs_client
-
 
 if __name__ == "__main__":
     X_train, X_test, y_train, y_test = load_data_MNIST()
