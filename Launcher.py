@@ -147,7 +147,7 @@ def main() -> None:
         directory_name,
         eval(args.accumulated_data),
     ]
-    """ 
+    #""" 
     print("-------------------" * 4 + "Start of Centralized" + "-----------------" * 4)
     start_centralized = time.time()
     centralized_process = Process(

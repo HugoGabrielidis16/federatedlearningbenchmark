@@ -4,9 +4,7 @@ def Data():
     from sklearn.model_selection import train_test_split
     import tensorflow as tf
 
-    train_df = pd.read_csv(
-        "/home/hugo/hugo/Stage/data/data_DisasterTweets/train.csv"
-    )
+    train_df = pd.read_csv("data/data_DisasterTweets/train.csv")
     # Shuffling the training dataframe
     train_df_shuffled = train_df.sample(frac=1, random_state=42)
 
@@ -19,9 +17,9 @@ def Data():
         test_size=0.1,
     )
     return (
-        tf.constant(X_train[:int(len(X_train))]),
+        tf.constant(X_train[: int(len(X_train))]),
         tf.constant(X_test),
-        tf.constant(y_train[:int(len(y_train))]),
+        tf.constant(y_train[: int(len(y_train))]),
         tf.constant(y_test),
     )
 
